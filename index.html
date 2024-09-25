@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perhitungan Bunga Tunggal dan Majemuk</title>
+    <link rel="stylesheet" href="style.css">
+
+    <script>
+        // Fungsi untuk memformat input angka dengan titik sebagai pemisah ribuan
+        function formatRupiah(input) {
+            let value = input.value.replace(/\./g, ''); // Menghapus titik yang sudah ada
+            let number = parseInt(value, 10);
+            
+            if (!isNaN(number)) {
+                // Memformat angka dengan titik setiap ribuan
+                input.value = number.toLocaleString('id-ID');
+            } else {
+                input.value = ''; // Kosongkan jika bukan angka
+            }
+        }
+
+        // Fungsi untuk menghitung bunga berdasarkan input
+        function hitungBunga(event) {
+            event.preventDefault();
+
+            // Mengambil nilai input dari form
+            let principleInput = document.getElementById('principle').value.replace(/\./g, '');
+            let principle = parseFloat(principleInput);
+            let rate = parseFloat(document.getElementById('rate').value);
+            let time = parseFloat(document.getElementById('time').value);
+            let type = document.getElementById('type').value;
+
+            // Validasi input
+            if (isNaN(principle) || isNaN(rate) || isNaN(time) || principle <= 0 || rate <= 0 || time <= 0) {
+                document.getElementById('result').innerHTML = "<p>Harap masukkan nilai yang valid!</p>";
+                return;
+            }
+
+            let interest, totalAmount;
+
+            if (type === 'simple') {
+                // Bunga Tunggal: A = P + (P * r * t)
+                interest = principle * (rate / 100) * time;
+                totalAmount = principle + interest;
+            } else if (type === 'compound') {
+                // Bunga Majemuk: A = P(1 + r)^t
+                totalAmount = principle * Math.pow((1 + rate / 100), time);
+                interest = totalAmount - principle;
+            }
+
+            // Format hasil dengan rupiah
+            let formattedPrinciple = principle.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            let formattedInterest = interest.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            let formattedTotal = totalAmount.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+            // Menampilkan hasil
+            document.getElementById('result').innerHTML = `
+                <h2>Hasil:</h2>
+                Jumlah Pokok: Rp ${formattedPrinciple}<br>
+                Bunga: Rp ${formattedInterest}<br>
+                Total: Rp ${formattedTotal}
+            `;
+        }
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Perhitungan Bunga</h1>
+        <form id="formBunga" onsubmit="hitungBunga(event)">
+            <label for="principle">Jumlah Pokok (Rp):</label>
+            <input type="text" id="principle" name="principle" required onkeyup="formatRupiah(this)"><br><br>
+
+            <label for="rate">Suku Bunga (% per tahun):</label>
+            <input type="number" id="rate" name="rate" step="0.01" required><br><br>
+
+            <label for="time">Jangka Waktu (tahun):</label>
+            <input type="number" id="time" name="time" required><br><br>
+
+            <label for="type">Jenis Bunga:</label>
+            <select id="type" name="type" required>
+                <option value="simple">Bunga Tunggal</option>
+                <option value="compound">Bunga Majemuk</option>
+            </select><br><br>
+
+            <button type="submit">Hitung Bunga</button>
+        </form>
+
+        <div id="result">
+            <h2>Hasil:</h2>
+        </div>
+    </div>
+</body>
+
+</html>
